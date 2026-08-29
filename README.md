@@ -83,7 +83,7 @@ julia src/run_benchmark.jl --arithmetic=bf16,bf16+fp32,fp16+fp32,fp32,posit8_2,p
 julia src/run_benchmark.jl --arithmetic=bf16,bf16+fp32,fp16+fp32,fp32,posit8_2,posit8_2+posit12_1,posit8_2+posit16_2,posit16_2,takum8,takum8+takum16,takum16 --model=tinysqueezenet --dataset=cifar10
 julia src/run_benchmark.jl --arithmetic=bf16,bf16+fp32,fp16+fp32,fp32,posit8_2,posit8_2+posit12_1,posit8_2+posit16_2,posit16_2,takum8,takum8+takum16,takum16 --model=microscopicvit --dataset=svhn2
 julia src/run_benchmark.jl --arithmetic=bf16,bf16+fp32,fp16+fp32,fp32,posit8_2,posit8_2+posit12_1,posit8_2+posit16_2,posit16_2,takum8,takum8+takum16,takum16 --model=chimera --dataset=fashionmnist
-```julia
+```
 
 ### Command-Line Options
 
