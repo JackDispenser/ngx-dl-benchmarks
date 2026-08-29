@@ -75,13 +75,13 @@ julia run_benchmark.jl --arithmetic=fp16 --model=resnet18 --dataset=cifar10
 
 These are the commands run for the associated paper:
 
-julia run_benchmark.jl --arithmetic=bf16,bf16+fp32,fp16+fp32,fp32,posit8_2,posit8_2+posit12_1,posit8_2+posit16_2,posit16_2,takum8,takum8+takum16,takum16 --model=lenet5 --dataset=mnist
-julia run_benchmark.jl --arithmetic=bf16,bf16+fp32,fp16+fp32,fp32,posit8_2,posit8_2+posit12_1,posit8_2+posit16_2,posit16_2,takum8,takum8+takum16,takum16 --model=smalldropoutnin --dataset=emnistbalanced
-julia run_benchmark.jl --arithmetic=bf16,bf16+fp32,fp16+fp32,fp32,posit8_2,posit8_2+posit12_1,posit8_2+posit16_2,posit16_2,takum8,takum8+takum16,takum16 --model=smallbatchnormnin --dataset=emnistbalanced
-julia run_benchmark.jl --arithmetic=bf16,bf16+fp32,fp16+fp32,fp32,posit8_2,posit8_2+posit12_1,posit8_2+posit16_2,posit16_2,takum8,takum8+takum16,takum16 --model=tinyresnet --dataset=cifar10
-julia run_benchmark.jl --arithmetic=bf16,bf16+fp32,fp16+fp32,fp32,posit8_2,posit8_2+posit12_1,posit8_2+posit16_2,posit16_2,takum8,takum8+takum16,takum16 --model=tinysqueezenet --dataset=cifar10
-julia run_benchmark.jl --arithmetic=bf16,bf16+fp32,fp16+fp32,fp32,posit8_2,posit8_2+posit12_1,posit8_2+posit16_2,posit16_2,takum8,takum8+takum16,takum16 --model=microscopicvit --dataset=svhn2
-julia run_benchmark.jl --arithmetic=bf16,bf16+fp32,fp16+fp32,fp32,posit8_2,posit8_2+posit12_1,posit8_2+posit16_2,posit16_2,takum8,takum8+takum16,takum16 --model=chimera --dataset=fashionmnist
+julia src/run_benchmark.jl --arithmetic=bf16,bf16+fp32,fp16+fp32,fp32,posit8_2,posit8_2+posit12_1,posit8_2+posit16_2,posit16_2,takum8,takum8+takum16,takum16 --model=lenet5 --dataset=mnist
+julia src/run_benchmark.jl --arithmetic=bf16,bf16+fp32,fp16+fp32,fp32,posit8_2,posit8_2+posit12_1,posit8_2+posit16_2,posit16_2,takum8,takum8+takum16,takum16 --model=smalldropoutnin --dataset=emnistbalanced
+julia src/run_benchmark.jl --arithmetic=bf16,bf16+fp32,fp16+fp32,fp32,posit8_2,posit8_2+posit12_1,posit8_2+posit16_2,posit16_2,takum8,takum8+takum16,takum16 --model=smallbatchnormnin --dataset=emnistbalanced
+julia src/run_benchmark.jl --arithmetic=bf16,bf16+fp32,fp16+fp32,fp32,posit8_2,posit8_2+posit12_1,posit8_2+posit16_2,posit16_2,takum8,takum8+takum16,takum16 --model=tinyresnet --dataset=cifar10
+julia src/run_benchmark.jl --arithmetic=bf16,bf16+fp32,fp16+fp32,fp32,posit8_2,posit8_2+posit12_1,posit8_2+posit16_2,posit16_2,takum8,takum8+takum16,takum16 --model=tinysqueezenet --dataset=cifar10
+julia src/run_benchmark.jl --arithmetic=bf16,bf16+fp32,fp16+fp32,fp32,posit8_2,posit8_2+posit12_1,posit8_2+posit16_2,posit16_2,takum8,takum8+takum16,takum16 --model=microscopicvit --dataset=svhn2
+julia src/run_benchmark.jl --arithmetic=bf16,bf16+fp32,fp16+fp32,fp32,posit8_2,posit8_2+posit12_1,posit8_2+posit16_2,posit16_2,takum8,takum8+takum16,takum16 --model=chimera --dataset=fashionmnist
 
 ### Command-Line Options
 
