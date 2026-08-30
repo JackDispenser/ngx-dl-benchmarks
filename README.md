@@ -103,15 +103,21 @@ Example benchmarking multiple arithmetic types:
 julia run_benchmark.jl --arithmetic=fp16,fp16+fp32,posit8_2 --model=lenet5 --dataset=mnist
 ```
 
+### Running from a Julia IDE
+
+To run one or all benchmarks without using the command line (e.g. from VS Code, Juno, or the JuliaHub IDE), open `src/run_all_benchmarks.jl`, set `RUN` to `"all"` or one of the named benchmarks (`mnist`, `emnist_dropout`, `emnist_batchnorm`, `cifar10_resnet`, `cifar10_squeezenet`, `svhn_vit`, `fashion_chimera`), and press "Run File". It activates the project, automatically installs any missing packages, and shells out to `run_benchmark.jl` with the arithmetic formats used in the paper.
+
 
 
 ## Results
 
-Benchmark outputs include:
+Each benchmark run writes its output to a `results/` directory at the repository root — regardless of the working directory the script is launched from (terminal, IDE, or as a subprocess of `run_all_benchmarks.jl`):
 
-* Per-epoch accuracy metrics for training and testing data
-
-Results can be exported in CSV or JSON for further analysis.
+```
+results/<model>/<dataset>/testing_logs.csv                       # per-epoch train/test accuracy, appended across runs
+results/<model>/<dataset>/log.txt                                # run log / any errors encountered while parsing results
+results/<model>/<dataset>/<arithmetic-type>/progress_controller.jld2   # transient checkpoint, deleted once parsed into the CSV
+```
 
 
 

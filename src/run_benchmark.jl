@@ -1,3 +1,7 @@
+import Pkg
+Pkg.activate(joinpath(@__DIR__, ".."))
+Pkg.instantiate()
+
 using Distributed
 using ArgParse
 #=
@@ -62,6 +66,8 @@ arith_list = [length(split(arith, "+")) == 1 ? arith : String.(split(arith, "+")
 worker_count = warmup_args["workers"]
 if (worker_count == -1) worker_count = length(arith_list) end
 addprocs(worker_count)
+
+@everywhere const RESULTS_DIR = joinpath(dirname(@__DIR__), "results")
 
 @everywhere begin
     using Lux
@@ -234,8 +240,8 @@ end
         error("Unknown dataset: $dataset. Valid options: $(join(keys(DATASETS), ", "))")
     end
     opt isa MixedPrecision ?
-        report_path = ("./$model/$dataset/($T, $(typeof(opt).parameters[1]))/") :
-        report_path = ("./$model/$dataset/$T/")
+        report_path = joinpath(RESULTS_DIR, model, dataset, "($T, $(typeof(opt).parameters[1]))") * "/" :
+        report_path = joinpath(RESULTS_DIR, model, dataset, "$T") * "/"
 
     mkpath(report_path)
     adaptor(m) = (Lux.LuxEltypeAdaptor{T}())(m)
@@ -257,14 +263,15 @@ end
     loss = m[2]
 
     local reload_epoch, ps, st, train_state, opt_state, epochs_accuracy, bestAccModel, done, rng
-    try
+    checkpoint_path = report_path * "progress_controller.jld2"
+    if isfile(checkpoint_path)
         reload_epoch, ps, st, opt_state, epochs_accuracy, bestAccModel, done, rng = JLD2.load(
-                                        report_path * "progress_controller.jld2",
+                                        checkpoint_path,
                                         "reload_epoch", "ps", "st", "opt_state", "epochs_accuracy", "bestAccModel", "done", "rng")
         train_state = Training.TrainState(model_built, ps, st, opt)
         @reset train_state.optimizer_state = opt_state
-    catch e
-        println("Generating fresh model data: $e")
+    else
+        println("Generating fresh model data")
         reload_epoch = 1
         rng = Xoshiro(seed)
         ps, st = LuxCore.setup(rng, model_built)
@@ -277,7 +284,7 @@ end
                            fill(Float64(0.0), epochs + 1))
         bestAccModel = (0, 0)
         done = false
-        save_checkpoint(report_path * "progress_controller.jld2";
+        save_checkpoint(checkpoint_path;
                 reload_epoch, ps, st, opt_state, epochs_accuracy, bestAccModel, done, rng)
     end
 
@@ -353,7 +360,7 @@ end
         st = train_state.states
         opt_state = train_state.optimizer_state
         reload_epoch = epoch + 1
-        save_checkpoint(report_path * "progress_controller.jld2";
+        save_checkpoint(checkpoint_path;
                         reload_epoch, ps, st, opt_state, epochs_accuracy, bestAccModel, done, rng)
         if halted != :no
             break
@@ -365,7 +372,7 @@ end
         st = train_state.states
         opt_state = train_state.optimizer_state
     end
-    save_checkpoint(report_path * "progress_controller.jld2";
+    save_checkpoint(checkpoint_path;
                 reload_epoch, ps, st, opt_state, epochs_accuracy, bestAccModel, done, rng)
     return completion_message
 end
@@ -390,12 +397,7 @@ end
 
 
 function main()
-    args = parse_cmdline_args()
-
-    arith_list = String.(split(args["arithmetic"], ","))
-
-    arith_list = [length(split(arith, "+")) == 1 ? arith : String.(split(arith, "+"))
-                  for arith in arith_list]
+    args = warmup_args
 
     # Claude used to convert to pmap
     results = pmap(arith_list; #=on_error = identity=#) do arith
@@ -404,7 +406,7 @@ function main()
                         patience=args["patience"], improvement_epsilon=args["improvement-epsilon"])
     end
 
-    report_path = "./$(args["model"])/$(args["dataset"])/"
+    report_path = joinpath(RESULTS_DIR, args["model"], args["dataset"]) * "/"
 
     # Only runs after all training is done; should be in the clear to assume done = true in all progress controllers
     csv_log = "\n~~~~\n" * CSVPrinter(report_path, arith_format.(arith_list))
