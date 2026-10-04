@@ -14,10 +14,18 @@ RUN = "all"
 # RUN = "fashion_chimera"
 
 
+const SEEDS = "0"
+# const SEEDS = "0,1,2,3,4"
+
+# Worker processes; -1 = one per job, capped at CPU threads minus one
+const WORKERS = -1
+
+# "-sr" = same format with stochastic rounding of the weight update
 const ARITHMETIC =
-    "bf16,bf16+fp32,fp16+fp32,fp32," *
-    "posit8_2,posit8_2+posit12_1,posit8_2+posit16_2,posit16_2," *
-    "takum8,takum8+takum16,takum16"
+    "fp16,bf16,bf16+fp32,fp16+fp32,fp32," *
+    "e5m2,e5m2-sr," *
+    "posit8_2,posit8_2-sr,posit8_2+posit12_1,posit8_2+posit16_2,posit16_2," *
+    "takum8,takum8-sr,takum8+takum16,takum16"
 
 
 const BENCHMARKS = Dict(
@@ -58,15 +66,15 @@ const BENCHMARKS = Dict(
 )
 
 
-function run_benchmark(name)
+function run_benchmarks(names)
 
-    benchmark = BENCHMARKS[name]
+    models   = join((BENCHMARKS[n].model for n in names), ",")
+    datasets = join((BENCHMARKS[n].dataset for n in names), ",")
 
     println()
     println("="^70)
-    println("Running benchmark: $name")
-    println("Model:   $(benchmark.model)")
-    println("Dataset: $(benchmark.dataset)")
+    println("Running benchmarks: $(join(names, ", "))")
+    println("Seeds: $SEEDS   Workers: $WORKERS")
     println("="^70)
     println()
 
@@ -75,14 +83,12 @@ function run_benchmark(name)
     cmd = `$(Base.julia_cmd())
         $script
         --arithmetic=$ARITHMETIC
-        --model=$(benchmark.model)
-        --dataset=$(benchmark.dataset)`
+        --model=$models
+        --dataset=$datasets
+        --seed=$SEEDS
+        --workers=$WORKERS`
 
     run(cmd)
-
-    println()
-    println("Completed: $name")
-    println()
 end
 
 
@@ -92,22 +98,16 @@ if RUN == "all"
         "mnist",
         "emnist_dropout",
         "emnist_batchnorm",
-        "cifar10_resnet",
-        "cifar10_squeezenet",
-        "svhn_vit",
         "fashion_chimera"
     ]
 
-    for name in benchmarks
-        run_benchmark(name)
-    end
+    run_benchmarks(benchmarks)
 
 elseif haskey(BENCHMARKS, RUN)
 
-    run_benchmark(RUN)
+    run_benchmarks([RUN])
 
 else
-
     error("""
     Unknown benchmark: $RUN
 

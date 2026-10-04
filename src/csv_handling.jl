@@ -2,7 +2,7 @@ using CSV
 using DataFrames
 using JLD2
 
-const NUMBER_FORMAT = Union{Type, Tuple{Type, Type}}
+const NUMBER_FORMAT = AbstractString
 
 function DataRow(batch_number::Integer, number_format::NUMBER_FORMAT, epoch_count::Integer, epochs_accuracy::AbstractArray, set_sampled::String)
     return (Training_Batch = batch_number,
